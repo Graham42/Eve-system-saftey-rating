@@ -25,30 +25,31 @@ choose a route through systems that they can navigation with relative safety.
   players who work together. The Corporation is a formalized in-game entity that can do more than a
   player can on their own. For example: anchoring a starbase to a moon's orbit.
 * Pilot - Another way to reference a player
+* CONCORD - The space police
+* Gate - A jump gate allows ships to travel to another solar system
 
 ## Inputs
 
 There are many more inputs that could be added but for the purpose of keeping this application
 simple, will limit to these 5.
 
-* _Solar system security rating_: System security can range from -1 to 1. In systems above 0 players
-  recieve a penalty for killing other players. In systems rated 0.5 and above CONCORD will also show
-  up and destroy attackers. Solar systems with higher security rating have faster CONCORD response
-  times. The game has conveniently named these regions of space in a fuzzy way. Null is from -1 up
-  to 0, Low is from 0 to 0.5, and High is from 0.5 to 1.
+* _SecurityRating_: A solar system's security rating can range from -1 to 1. In systems above 0
+  players recieve a penalty for killing other players. In systems rated 0.5 and above CONCORD will
+  also show up and destroy attackers. Solar systems with higher security rating have faster CONCORD
+  response times.
 
-* _Incursion active in system_: From time to time a certain faction of NPCs will invade areas of
-  space. If an incursion is active in a system the gates will likely be gaurded by NPCs. Based on
-  how much players have pushed back the incursion, the NPCs with have from 0% and 100% control.
+* _IncursionControl_: From time to time a certain faction of NPCs will invade areas of space. This
+  event is called an incursion. If an incursion is active in a system the gates will likely be
+  gaurded by NPCs. Based on how much players have pushed back the incursion, the NPCs with have from
+  0% to 100% control.
 
-* _Number of Corporation members in space now_: If there are a higher number of friendly pilots in
-  the area of space, it's likely they can defend you or clear the area ahead of time.
+* _NonAlliedPilots_: This is a derived input from two pieces of information available to a player;
+  the number of corporation members in space right now, and the average number of players in space
+  in the last 30 minutes. The more pilots in space, who are not in your corporation, the more
+  dangerous it is to travel through a given system.
 
-* _Average Number of Players in space in last 30 minutes_: The more pilots in space who are not in
-  your corporation, the more dangerous it is to travel there.
-
-* _Ships destroyed in the last hour_: If ships have been recently destroyed in an area of space it's
-  possibly still dangerous
+* _ShipsDestroyed_: The player has the number of ships destroyed in the last hour. If ships have
+  been recently destroyed in an area of space it's possibly still dangerous.
 
 ## Output Range
 
@@ -56,5 +57,24 @@ Safe, Somewhat Safe, Somewhat Dangerous, Dangerous, Very Dangerous
 
 The output is asymmetric on purpose as a player should understand they are never "Very Safe" if they
 have undocked their ship from a station.
+
+# Setup
+
+These steps assume a linux machine
+
+## Fuzzylite
+
+This program relies on the fuzzylite library.
+
+1. Download the source code from https://github.com/fuzzylite/fuzzylite/archive/v5.1.zip
+2. Extract the zip and go into that folder in a terminal
+3. Follow this
+  ```sh
+  cd fuzzylite/
+  ./build.sh release
+  cd release/
+  make
+  sudo make install
+  ```
 
 
