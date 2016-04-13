@@ -69,6 +69,7 @@ This program relies on the fuzzylite library.
 1. Download the source code from https://github.com/fuzzylite/fuzzylite/archive/v5.1.zip
 2. Extract the zip and go into that folder in a terminal
 3. Follow this
+
   ```sh
   cd fuzzylite/
   ./build.sh release
@@ -76,5 +77,12 @@ This program relies on the fuzzylite library.
   make
   sudo make install
   ```
+
+## This Program
+
+```sh
+make
+./safety-rating.run
+```
 
 
