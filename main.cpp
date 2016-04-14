@@ -38,8 +38,8 @@ int main(){
     InputVariable* incursionControl = new InputVariable;
     incursionControl->setName("IncursionControl");
     incursionControl->setRange(0.00, 1.00);
-    incursionControl->addTerm(new Ramp("Low",  0.40, 0.00));
-    incursionControl->addTerm(new Ramp("High", 0.30, 0.80));
+    incursionControl->addTerm(new Ramp(     "Low",  0.40, 0.00));
+    incursionControl->addTerm(new Ramp(     "High", 0.30, 0.80));
     engine->addInputVariable(incursionControl);
 
     InputVariable* nonAlliedPilots = new InputVariable;
@@ -53,9 +53,10 @@ int main(){
     InputVariable* shipsDestroyed = new InputVariable;
     shipsDestroyed->setName("ShipsDestroyed");
     shipsDestroyed->setRange(0, 5000);
-    shipsDestroyed->addTerm(new Ramp(    "Low",    4, 0));
-    shipsDestroyed->addTerm(new Triangle("Medium", 2, 10));
-    shipsDestroyed->addTerm(new Ramp(    "High",   6, 10));
+    shipsDestroyed->addTerm(new Ramp(    "VeryLow", 1, 0));
+    shipsDestroyed->addTerm(new Ramp(    "Low",     4, 0));
+    shipsDestroyed->addTerm(new Triangle("Medium",  2, 10));
+    shipsDestroyed->addTerm(new Ramp(    "High",    6, 10));
     engine->addInputVariable(shipsDestroyed);
 
     OutputVariable* safety = new OutputVariable;
@@ -69,12 +70,38 @@ int main(){
     safety->addTerm(new Ramp(    "Safe",              0.75, 1.00));
     engine->addOutputVariable(safety);
 
+
     RuleBlock* ruleblock = new RuleBlock;
+    ruleblock->addRule(Rule::parse("if SecurityRating is High then Safety is Safe", engine));
     ruleblock->addRule(Rule::parse("if SecurityRating is Low then Safety is Dangerous", engine));
     ruleblock->addRule(Rule::parse("if SecurityRating is VeryLow then Safety is VeryDangerous", engine));
+
+    ruleblock->addRule(Rule::parse(
+          std::string("if IncursionControl is Low and SecurityRating is not High")
+          + " then Safety is SomewhatDangerous", engine));
+    ruleblock->addRule(Rule::parse("if IncursionControl is High then Safety is Dangerous", engine));
+    ruleblock->addRule(Rule::parse(
+          std::string("if IncursionControl is High and SecurityRating is VeryLow")
+          + " then Safety is VeryDangerous", engine));
+
+    ruleblock->addRule(Rule::parse("if NonAlliedPilots is Low then Safety is Safe", engine));
+    ruleblock->addRule(Rule::parse(
+          std::string("if NonAlliedPilots is Medium and")
+          + std::string(" (SecurityRating is Low or SecurityRating is VeryLow)")
+          + " then Safety is Dangerous", engine));
+    ruleblock->addRule(Rule::parse(
+          std::string("if NonAlliedPilots is High and")
+          + std::string(" (SecurityRating is Low or SecurityRating is VeryLow)")
+          + " then Safety is VeryDangerous", engine));
+
+    ruleblock->addRule(Rule::parse("if ShipsDestroyed is VeryLow then Safety is Safe", engine));
+    ruleblock->addRule(Rule::parse("if ShipsDestroyed is Low then Safety is SomewhatSafe", engine));
+    ruleblock->addRule(Rule::parse("if ShipsDestroyed is Medium then Safety is Dangerous", engine));
+    ruleblock->addRule(Rule::parse("if ShipsDestroyed is High then Safety is VeryDangerous", engine));
+
     engine->addRuleBlock(ruleblock);
 
-    engine->configure("", "", "Minimum", "Maximum", "Centroid");
+    engine->configure("Minimum", "Maximum", "Minimum", "Maximum", "Centroid");
 
     std::string status;
     if (not engine->isReady(&status)){
