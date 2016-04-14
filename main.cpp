@@ -1,6 +1,29 @@
 #include "fl/Headers.h"
 #include <string>
-int main(int argc, char* argv[]){
+
+double getInputNumberInRange(std::string prompt, fl::InputVariable* inVar){
+  double num = 0;
+  std::string input = "";
+
+  while (true) {
+    std::cout << prompt << " (" << inVar->getMinimum() << " to " << inVar->getMaximum() << "): ";
+    getline(std::cin, input);
+
+    // Convert from string to number safely.
+    std::stringstream myStream(input);
+    if (myStream >> num){
+      // make sure it's in the allowed range
+      if (num >= inVar->getMinimum() && num <= inVar->getMaximum()){
+        break;
+      }
+    }
+    std::cout << "Invalid number, please try again" << std::endl;
+  }
+
+  return num;
+}
+
+int main(){
     using namespace fl;
     Engine* engine = new Engine("safety-rating");
 
@@ -53,15 +76,30 @@ int main(int argc, char* argv[]){
 
     engine->configure("", "", "Minimum", "Maximum", "Centroid");
 
-    //std::string status;
-    //if (not engine->isReady(&status))
-    //    throw Exception("Engine not ready. "
-    //        "The following errors were encountered:\n" + status, FL_AT);
-    //for (int i = 0; i < 50; ++i){
-    //    scalar light = securityRating->getMinimum() + i * (securityRating->range() / 50);
-    //    securityRating->setInputValue(light);
-    //    engine->process();
-    //    FL_LOG("securityRating.input = " << Op::str(light) << " -> " <<
-    //        "Power.output = " << Op::str(power->getOutputValue()));
-    //}
+    std::string status;
+    if (not engine->isReady(&status)){
+        throw Exception("Engine not ready. "
+            "The following errors were encountered:\n" + status, FL_AT);
+    }
+
+    // get user input for a system
+    std::cout << "Please enter the following information for the system you want evaluate" << std::endl;
+
+    securityRating->setInputValue(getInputNumberInRange("Securty Rating", securityRating));
+    incursionControl->setInputValue(getInputNumberInRange("Incursion Control Percent as a Decimal",
+          incursionControl));
+
+    int totalPilots = getInputNumberInRange("Average number of players in space in the last 30 minutes",
+        nonAlliedPilots);
+    int corpPilots = getInputNumberInRange("Number of corporation members in space", nonAlliedPilots);
+    int nonAllied = totalPilots - corpPilots;
+    if (nonAllied < 0)
+      nonAllied = 0;
+    nonAlliedPilots->setInputValue(nonAllied);
+
+    shipsDestroyed->setInputValue(getInputNumberInRange("Ships destroyed in the last 30 minutes",
+          shipsDestroyed));
+    engine->process();
+
+    std::cout << "Safety rating is " << safety->getOutputValue() << std::endl;
 }

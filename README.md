@@ -45,7 +45,7 @@ simple, will limit to these 5.
 
 * _NonAlliedPilots_: This is a derived input from two pieces of information available to a player;
   the number of corporation members in space right now, and the average number of players in space
-  in the last 30 minutes. The more pilots in space, who are not in your corporation, the more
+  in the last 30 minutes. The more pilots in space, who are **not** in your corporation, the more
   dangerous it is to travel through a given system.
 
 * _ShipsDestroyed_: The player has the number of ships destroyed in the last hour. If ships have
@@ -80,9 +80,10 @@ This program relies on the fuzzylite library.
 
 ## This Program
 
+If `make` fails you may need to run `export PKG_CONFIG_PATH="/usr/local/lib/pkgconfig/"` first
+
 ```sh
 make
 ./safety-rating.run
 ```
-
 
